@@ -1,0 +1,48 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+parameters:
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/*'
+        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php,DTO}'
+
+    # controllers are imported separately to make sure services can be injected
+    # as action arguments even if you don't extend any base controller class
+    App\Controller\:
+        resource: '../src/Controller'
+        tags: ['controller.service_arguments']
+
+    a0_user_provider:
+        class: App\Security\A0UserProvider
+        arguments: ["@jwt_auth.auth0_service"]
+
+    exception.listener:
+        class: App\EventListener\AuthenticationExceptionListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException}
+
+    api_exception_subscriber:
+        class: App\EventListener\ApiExceptionSubscriber
+        arguments: []
+        tags:
+            - { name: kernel.event_subscriber }
+
+    request_params_to_json:
+        class: App\Request\RequestParamsToJson
+        arguments: ['@jms_serializer.serializer']
+        tags:
+            - { name: request.param_converter, priority: -100 }
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones

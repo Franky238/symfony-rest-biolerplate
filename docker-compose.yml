@@ -1,0 +1,45 @@
+version: '3'
+services:
+    apache:
+        build: .docker/apache
+        container_name: apache
+        ports:
+          - 80:80
+        volumes:
+          - .docker/config/vhosts:/etc/apache2/sites-enabled
+          - .:/home/wwwroot/app_name
+          - ./vendor:/home/wwwroot/rent_a_car/vendor:cached #caching vendor
+          - ./var:/home/wwwroot/rent_a_car/var:cached #caching var
+        depends_on:
+          - php
+
+    mysql:
+        image: mysql
+        command: "--default-authentication-plugin=mysql_native_password"
+        container_name: mysql
+        ports:
+          - "3306:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: app_db
+            MYSQL_USER: app_name
+            MYSQL_PASSWORD: pass
+
+    php:
+        build: .docker/php
+        container_name: php
+        volumes:
+          - .:/home/wwwroot/app_name
+        depends_on:
+          - mysql
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: phpmyadmin
+        environment:
+          PMA_HOST: mysql
+          PMA_PORT: 3306
+        ports:
+          - 9001:80
+        links:
+          - mysql
