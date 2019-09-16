@@ -18,8 +18,9 @@ Docker is available also. (see `.docker` folder and `docker-compose.yml`)
  * @param CarDTO $carDTO
  * @return void
  * @Rest\Put("/cars/{id}")
+ * @ParamConverter("carDTO", converter="fos_rest.request_body")
  */
- public function updateCarAction(int $id, CarDTO $carDTO) {
+ public function updateCarAction(int $id, CarDTO $carDTO, ConstraintViolationListInterface $validationErrors) {
      var_dump($carDTO);die;
  }
 ```
