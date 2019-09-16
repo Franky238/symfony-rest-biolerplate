@@ -21,6 +21,6 @@ Docker is available also. (see `.docker` folder and `docker-compose.yml`)
  * @ParamConverter("carDTO", converter="fos_rest.request_body")
  */
  public function updateCarAction(int $id, CarDTO $carDTO, ConstraintViolationListInterface $validationErrors) {
-     DTOValidator::validate($carDTO); // validation of DTO
+     DTOValidator::validate($validationErrors); // validation of DTO
  }
 ```
