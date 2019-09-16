@@ -2,6 +2,7 @@
 
 namespace App\EventListener;
 
+use App\Exception\ApiProblemException;
 use Auth0\SDK\Exception\CoreException;
 use Auth0\SDK\Exception\InvalidTokenException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,6 +16,10 @@ class AuthenticationExceptionListener
     {
         $exception = $event->getException();
         $code = 500;
+
+        if ($exception instanceof ApiProblemException) {
+            return;
+        }
 
         if ($exception instanceof CoreException) {
             $code = 401;
